@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const { ENV } = require('../dotenv');
 
-var db_url = 'mongodb://127.0.0.1:27017/todo-app';
+var db_url = `${ENV.DB_HOST}/${ENV.DB_NAME}`;
 mongoose.connect(db_url, {
     useNewUrlParser: true,
     useUnifiedTopology: true

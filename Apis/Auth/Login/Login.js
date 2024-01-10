@@ -2,7 +2,7 @@ const User = require('../../../Models/user')
 const express = require('express')
 const login = express.Router();
 const JWT = require('jsonwebtoken');
-const JWT_SECRET = 'eiuehnx!@#nekjnkndkjdejhkwenbceuuyuewyuqwed';
+const { ENV } = require('../../../dotenv');
 
 
 login.post('/', async (req, res) => {
@@ -25,7 +25,7 @@ login.post('/', async (req, res) => {
                         email: user.email,
                         gender: user.gender,
                         url: user.url
-                    }, JWT_SECRET);
+                    }, ENV.JWT_SECRET);
                     return res.json({
                         user: { name: user.name, gender: user.gender, email: user.email, _id: user._id, phone: user.phone, address: user.address, img_url:user.img_url},
                         message: 'Login Successfully',

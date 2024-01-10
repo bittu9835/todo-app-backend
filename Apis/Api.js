@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express.Router();
 const JWT = require('jsonwebtoken');
-const JWT_SECRET = 'eiuehnx!@#nekjnkndkjdejhkwenbceuuyuewyuqwed';
+const { ENV } = require('../dotenv');
 
 app.use('/auth', require('./Auth/Auth'))
 
@@ -13,7 +13,7 @@ const verifyToken = (req, res, next) => {
         return res.status(401).json({ message: 'Authorization token is missing' });
     }
     try {
-        const decoded = JWT.verify(token, JWT_SECRET);
+        const decoded = JWT.verify(token, ENV.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (err) {

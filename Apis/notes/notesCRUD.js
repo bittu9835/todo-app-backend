@@ -1,6 +1,7 @@
 const notes = require('../../Models/notes');
 const moment = require('moment');
-
+const ServerResponseClass = require('../../ServerResponse/ServerResponse')
+const response = new ServerResponseClass();
 
 module.exports = {
 
@@ -8,18 +9,20 @@ module.exports = {
   readTaskNotes: async (req, res) => {
     try {
       const note = await notes.find({ created_by: req.user._id, isDeleted: false, isCompleted: false })
-      return res.status(200).json({ message: "Data fetched", note })
+      response.handleSuccess(res, note, "Data fetched")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
   readEditTaskNotes: async (req, res) => {
     try {
       const note = await notes.findById(req.params);
-      return res.status(200).json({ message: "Data fetched", note })
+      response.handleSuccess(res, note, "Data fetched")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -31,9 +34,10 @@ module.exports = {
         isCompleted: false,
         page: 'My Day'
       })
-      return res.status(200).json({ message: "Data fetched", note })
+      response.handleSuccess(res, note, "Data fetched")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -45,9 +49,10 @@ module.exports = {
         isCompleted: false,
         page: 'Importent'
       })
-      return res.status(200).json({ message: "Data fetched", note })
+      response.handleSuccess(res, note, "Data fetched")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -59,33 +64,36 @@ module.exports = {
         isCompleted: false,
         page: 'Planned'
       })
-      return res.status(200).json({ message: "Data fetched", note })
+      response.handleSuccess(res, note, "Data fetched")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
   readCompletedTask: async (req, res) => {
     try {
       const note = await notes.find({ created_by: req.user._id, isDeleted: false, isCompleted: true })
-      return res.status(200).json({ message: "Data fetched", note })
+      response.handleSuccess(res, note, "Data fetched")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
   readSearchTask: async (req, res) => {
     try {
       const note = await notes.find({
-        "$or":[
-          {"tasks":{$regex:req.params.value}},
+        "$or": [
+          { "tasks": { $regex: req.params.value } },
         ],
         created_by: req.user._id,
-        isDeleted:false
+        isDeleted: false
       })
-      return res.status(200).json({ message: "Data fetched", note })
+      response.handleSuccess(res, note, "Data fetched")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -97,9 +105,10 @@ module.exports = {
         isCompleted: true,
         page: 'My Day'
       })
-      return res.status(200).json({ message: "Data fetched", note })
+      response.handleSuccess(res, note, "Data fetched")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -107,9 +116,10 @@ module.exports = {
   readRecyclebin: async (req, res) => {
     try {
       const note = await notes.find({ created_by: req.user._id, isDeleted: true })
-      return res.status(200).json({ message: "Data fetched", note })
+      response.handleSuccess(res, note, "Data fetched")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -118,30 +128,32 @@ module.exports = {
       let { _id } = req.user
       let { tasks, page, icon } = req.body;
       if (!tasks) {
-        return res.status(400).json({ message: 'Task is requred' });
+        response.badRequest(res, '', ' Task is requred')
       } else {
         let note = await notes.create({
           tasks,
           page,
           icon,
           created_by: _id,
-          createdAt:moment().format('ddd, MMMM D'),
-          modifiedAt:moment().format('ddd, MMMM D')
+          createdAt: moment().format('ddd, MMMM D'),
+          modifiedAt: moment().format('ddd, MMMM D')
         });
-        return res.status(200).json({ message: 'Task created', note });
+        response.handleSuccess(res, note, "Task created")
       }
     } catch (error) {
-      return res.status(500).json({ message: 'internal server error', error })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
   updateNotes: async (req, res) => {
-   
+
     try {
       const note = await notes.findByIdAndUpdate(req.params, req.body)
-      return res.status(200).json({ message: "Task updated successfully ", note })
+      response.handleSuccess(res, note, "Task updated successfully")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -149,9 +161,10 @@ module.exports = {
     try {
       const { _id } = req.params
       const note = await notes.findByIdAndUpdate(_id, { isCompleted: true })
-      return res.status(200).json({ message: "Task Completed", note })
+      response.handleSuccess(res, note, "Task Completed")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -161,9 +174,10 @@ module.exports = {
     try {
       const { _id } = req.params
       const note = await notes.findByIdAndUpdate(_id, { isCompleted: false })
-      return res.status(200).json({ message: "Task uncompleted", note })
+      response.handleSuccess(res, note, "Task uncompleted")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -171,18 +185,20 @@ module.exports = {
     try {
       const { _id } = req.params
       const note = await notes.findByIdAndDelete(_id)
-      return res.status(200).json({ message: "Task Parmanently Deleted", note })
+      response.handleSuccess(res, note, "Task Parmanently Deleted")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
   parmanentdeleteAllNotes: async (req, res) => {
     try {
-      const note = await notes.deleteMany({created_by: req.user._id, isDeleted: true })
-      return res.status(200).json({ message: "All Task Parmanently Deleted", note })
+      const note = await notes.deleteMany({ created_by: req.user._id, isDeleted: true })
+      response.handleSuccess(res, note, "All Task Parmanently Deleted")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -190,9 +206,10 @@ module.exports = {
     try {
       const { _id } = req.params
       const note = await notes.findByIdAndUpdate(_id, { isDeleted: false })
-      return res.status(200).json({ message: "Task Restored", note })
+      response.handleSuccess(res, note, "Task Restored")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
@@ -200,21 +217,21 @@ module.exports = {
     try {
       const { _id } = req.params
       const note = await notes.findByIdAndUpdate(_id, { isDeleted: true })
-      return res.status(200).json({ message: "Task Trashed", note })
+      response.handleSuccess(res, note, "Task Trashed")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
 
   parmanentdeleteAllNotes_user: async (req, res) => {
     try {
-      const note = await notes.deleteMany({created_by: req.user._id})
-      return res.status(200).json({ message: "All Task Parmanently Deleted", note })
+      const note = await notes.deleteMany({ created_by: req.user._id })
+      response.handleSuccess(res, note, "All Task Parmanently Deleted")
     } catch (error) {
-      return res.status(500).json({ message: error.message })
+      console.log(error)
+      response.somethingWentWrong(res, error)
     }
   },
-
-
 
 }
